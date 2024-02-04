@@ -40,6 +40,7 @@ public class CatScriptTokenizer {
 
     private boolean scanString() {
         // TODO implement string scanning here!
+        // todo Add check here,  check for position after to make sure you grab all numbers
         return false;
     }
 
