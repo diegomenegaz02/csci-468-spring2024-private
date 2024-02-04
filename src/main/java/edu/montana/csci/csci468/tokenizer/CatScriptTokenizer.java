@@ -1,5 +1,8 @@
 package edu.montana.csci.csci468.tokenizer;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static edu.montana.csci.csci468.tokenizer.TokenType.*;
 
 public class CatScriptTokenizer {
@@ -26,12 +29,12 @@ public class CatScriptTokenizer {
     }
 
     private void scanToken() {
+
+
         if(scanNumber()) {
             return;
         }
-        if(scanString()) {
-            return;
-        }
+//Removed function here and put it to only occur when a " is scanned.
         if(scanIdentifier()) {
             return;
         }
@@ -41,6 +44,37 @@ public class CatScriptTokenizer {
     private boolean scanString() {
         // TODO implement string scanning here!
         // todo Add check here,  check for position after to make sure you grab all numbers
+        String word = "";
+        String fullword = "";
+        if(isAlpha(peek())){
+
+           int start =postion;
+            while(isAlpha(peek()) || peek() == ('\\') || peek() == '\"' ){
+                if(peek()!= '\"' && peek()!='\\'){
+                    char character = takeChar();
+                    word = word + character;
+                    fullword = fullword + character;
+                }else{
+                    char character = takeChar();
+                    fullword = fullword + character;
+                }
+            }
+            Pattern pattern = Pattern.compile("\"(.*?)\"");
+            Matcher matcher = pattern.matcher(fullword);
+            String subword ="";
+
+
+            if(!fullword.endsWith("\"") && tokenizationEnd()){
+                tokenList.addToken(ERROR, fullword,start,postion,line,lineOffset);
+                return true;
+            } else if(!word.equals("var") && peek() != ' ' ){
+                tokenList.addToken(STRING, word, start, postion, line, lineOffset);
+                return true;
+            }else{
+                return false;
+            }
+        }
+
         return false;
     }
 
@@ -97,7 +131,10 @@ public class CatScriptTokenizer {
             } else {
                 tokenList.addToken(EQUAL, "=", start, postion, line, lineOffset);
             }
-        } else {
+        } else if(matchAndConsume('\"')){
+            if(!tokenizationEnd()){
+            scanString();}
+        }else {
             tokenList.addToken(ERROR, "<Unexpected Token: [" + takeChar() + "]>", start, postion, line, lineOffset);
         }
     }
@@ -111,6 +148,8 @@ public class CatScriptTokenizer {
                 continue;
             } else if (c == '\n') {
                 postion++;
+                line ++;
+
                 continue;
             }
             break;
