@@ -34,6 +34,9 @@ public class CatScriptTokenizer {
         if(scanNumber()) {
             return;
         }
+        if(scanString()){
+            return;
+        }
 //Removed function here and put it to only occur when a " is scanned.
         if(scanIdentifier()) {
             return;
@@ -46,28 +49,52 @@ public class CatScriptTokenizer {
         // todo Add check here,  check for position after to make sure you grab all numbers
         String word = "";
         String fullword = "";
-        if(isAlpha(peek())){
-
+        if(peek() == '\"'){
+    //Loop through until there is no more char in peek()
            int start =postion;
-            while(isAlpha(peek()) || peek() == ('\\') || peek() == '\"' ){
-                if(peek()!= '\"' && peek()!='\\'){
-                    char character = takeChar();
-                    word = word + character;
-                    fullword = fullword + character;
-                }else{
-                    char character = takeChar();
-                    fullword = fullword + character;
-                }
-            }
-            Pattern pattern = Pattern.compile("\"(.*?)\"");
-            Matcher matcher = pattern.matcher(fullword);
-            String subword ="";
+           takeChar();
+           while(!tokenizationEnd()) {
+              //consume first quotation
+               while (peek()!= '\"') {
+
+                   if (peek() != '\\') {
+                       if(tokenizationEnd()){
+                           //if it doesnt end with a /" it won't exit for loop
+                           tokenList.addToken(ERROR, fullword,start,postion,line,lineOffset);
+                           return true;
+                       }
+                       char character = takeChar();
+                       word = word + character;
+                       fullword = fullword + character;
+
+                   } else {
+                       if(tokenizationEnd()){
+                           //if it doesnt end with a /" it won't exit for loop
+                           tokenList.addToken(ERROR, fullword,start,postion,line,lineOffset);
+                           return true;
+                       }
+
+                       char character = takeChar();
+                       fullword = fullword + character;
+                   }
+               }
+               //Two senarios, the string continues i.e consume this quote add to work if next isnt another quote.
+               //Second Scenario, start of a new string i.e another quote after to consume to start other string.
+               char character = takeChar(); //either way we consume the quote
+               if(peek() == '\"'){
+                   tokenList.addToken(STRING,word,start,postion,line,lineOffset);//substring
+                   takeChar();
+                   word = "";
+               }else if(!tokenizationEnd()){
+                   word = word +character;
+               }
 
 
-            if(!fullword.endsWith("\"") && tokenizationEnd()){
-                tokenList.addToken(ERROR, fullword,start,postion,line,lineOffset);
-                return true;
-            } else if(!word.equals("var") && peek() != ' ' ){
+
+           }
+
+
+        if(!word.equals("var") && peek() != ' '  ){
                 tokenList.addToken(STRING, word, start, postion, line, lineOffset);
                 return true;
             }else{
@@ -131,9 +158,8 @@ public class CatScriptTokenizer {
             } else {
                 tokenList.addToken(EQUAL, "=", start, postion, line, lineOffset);
             }
-        } else if(matchAndConsume('\"')){
-            if(!tokenizationEnd()){
-            scanString();}
+        }else if(matchAndConsume('(')){
+
         }else {
             tokenList.addToken(ERROR, "<Unexpected Token: [" + takeChar() + "]>", start, postion, line, lineOffset);
         }
@@ -148,8 +174,7 @@ public class CatScriptTokenizer {
                 continue;
             } else if (c == '\n') {
                 postion++;
-                line ++;
-
+                line++;
                 continue;
             }
             break;
