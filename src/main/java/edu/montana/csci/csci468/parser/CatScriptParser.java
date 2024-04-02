@@ -9,6 +9,7 @@ import edu.montana.csci.csci468.tokenizer.TokenType;
 import spark.Request;
 
 import javax.swing.plaf.nimbus.State;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -73,8 +74,97 @@ public class CatScriptParser {
         if(varStmt != null){
             return varStmt;
         }
+        Statement forStmt = parseForStatement();
+        if(forStmt != null){
+            return forStmt;
+        }
+        Statement ifStmt = parseIfStatement();
+        if(ifStmt != null){
+            return ifStmt;
+        }
         return new SyntaxErrorStatement(tokens.consumeToken());
     }
+
+    private Statement parseFunctionDefinition() {
+        if(tokens.match(FUNCTION)){
+            tokens.consumeToken();
+            FunctionDefinitionStatement functionDefinitionStatement= new FunctionDefinitionStatement();
+            require(IDENTIFIER,functionDefinitionStatement,ErrorType.UNEXPECTED_TOKEN);
+            Token name = tokens.consumeToken();
+            functionDefinitionStatement.setName(name.getStringValue());
+            if(tokens.match(LEFT_PAREN)){
+                tokens.consumeToken();
+                while(!tokens.match(RIGHT_PAREN)){
+                    //Param Parsing
+                    Token Identifier = tokens.consumeToken();
+                    if(tokens.match(COLON)){
+                        tokens.consumeToken();
+                        final Expression type = parseTypeExpression();
+
+                    }
+                }
+            }
+
+        }
+
+
+
+    }
+
+    private Statement parseIfStatement(){
+        if(tokens.match(IF)){
+            List<Statement> statementList = new ArrayList<>();
+            tokens.consumeToken();
+            IfStatement ifStatement = new IfStatement();
+            if(tokens.match(LEFT_PAREN)){
+                tokens.consumeToken();
+                final Expression expression = parseExpression();
+                ifStatement.setExpression(expression);
+                tokens.consumeToken();
+                if(tokens.match(LEFT_BRACE)){
+                    while(!tokens.match(RIGHT_BRACE)){
+                        tokens.consumeToken();
+                        Statement statement = parseProgramStatement();
+                        statementList.add(statement);
+                        if(tokens.match(EOF)){
+                            ifStatement.addError(ErrorType.UNEXPECTED_TOKEN,tokens.getCurrentToken());
+                            return ifStatement;
+                        }
+                    }
+                    ifStatement.setTrueStatements(statementList);
+                    tokens.consumeToken();
+                }
+                if(tokens.match(ELSE)){
+                    List<Statement> elseStatements = new ArrayList<>();
+                    //Another if statement
+                    tokens.consumeToken();
+
+                    //IF or LEFT_BRACE to determine
+                    if(tokens.match(LEFT_BRACE)){
+                        tokens.consumeToken();
+                        if(tokens.match(EOF)){
+                            ifStatement.addError(ErrorType.UNEXPECTED_TOKEN,tokens.getCurrentToken());
+                            return ifStatement;
+                        }
+                        while(!tokens.match(RIGHT_BRACE)){
+                            Statement statement = parseProgramStatement();
+                            elseStatements.add(statement);
+                        }
+                        require(RIGHT_BRACE,ifStatement,ErrorType.UNEXPECTED_TOKEN);
+                        ifStatement.setElseStatements(elseStatements);
+                        return ifStatement;
+                    }else if (tokens.match(IF)){
+                        parseIfStatement();
+                        return ifStatement;
+                    }
+                }else{
+                    return ifStatement;
+                }
+            }
+        }
+        return null;
+    }
+
     private Statement parseAssignmentStatement(){
         if(tokens.match(IDENTIFIER)){
             Token IDToken = tokens.consumeToken();
@@ -90,6 +180,47 @@ public class CatScriptParser {
             return null;
         }
     }
+    private Statement parseForStatement() {
+        List<Statement> statementList= new ArrayList<>();
+        if(tokens.match(FOR)) {
+            ForStatement forStatement = new ForStatement();
+            tokens.consumeToken();
+            if(tokens.match(LEFT_PAREN)){
+                tokens.consumeToken();
+                Token Id = tokens.consumeToken();
+                forStatement.setVariableName(Id.getStringValue());
+                if(tokens.match(IN)){
+                    tokens.consumeToken();
+                    Expression expression = parseExpression();
+                    forStatement.setExpression(expression);
+                    tokens.consumeToken();
+                    require(RIGHT_PAREN,forStatement,ErrorType.UNEXPECTED_TOKEN);
+                    if(tokens.match(LEFT_BRACE)){
+                        while(!tokens.match(RIGHT_BRACE)) {
+                            tokens.consumeToken();
+                            Statement statement = parseProgramStatement();
+                            statementList.add(statement);
+                            if(tokens.match(EOF)){
+                                forStatement.addError(ErrorType.UNEXPECTED_TOKEN,tokens.getCurrentToken());
+                                return forStatement;
+                            }
+
+                        }
+                        forStatement.setBody(statementList);
+                        tokens.consumeToken();
+                        return forStatement;
+                    }
+                }else {
+                    forStatement.hasError(ErrorType.UNEXPECTED_TOKEN);
+                }
+            }else{
+                forStatement.hasError(ErrorType.UNEXPECTED_TOKEN);
+            }
+        }
+        return null;
+
+    }
+
     private Statement parsePrintStatement() {
         if (tokens.match(PRINT)) {
 
