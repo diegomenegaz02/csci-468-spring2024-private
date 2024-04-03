@@ -99,7 +99,9 @@ public class CatScriptParser {
                     Token Identifier = tokens.consumeToken();
                     if(tokens.match(COLON)){
                         tokens.consumeToken();
-                        final Expression type = parseTypeExpression();
+                        Expression type = parseTypeExpression();
+
+
 
                     }
                 }
@@ -107,8 +109,7 @@ public class CatScriptParser {
 
         }
 
-
-
+        return null;
     }
 
     private Statement parseIfStatement(){
