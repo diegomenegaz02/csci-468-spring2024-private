@@ -145,9 +145,8 @@ public class FunctionDefinitionStatement extends Statement {
     // Implementation
     //==============================================================
     @Override
-    public void execute(CatscriptRuntime runtime) {
-        super.execute(runtime);
-    }
+    public void execute(CatscriptRuntime runtime) { //Supposed to be Empty
+                                                  } //This is cursed LMAO
 
     @Override
     public void transpile(StringBuilder javascript) {

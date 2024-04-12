@@ -100,7 +100,7 @@ public class CatScriptTokenizer {
                    break;
                }
            } // end While
-            if(!word.equals("var") && peek() != ' '){
+            if(!word.equals("var")){
                 tokenList.addToken(STRING, word, start, postion, line, lineOffset);
                 return true;
             }else{

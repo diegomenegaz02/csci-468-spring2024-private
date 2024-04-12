@@ -53,7 +53,51 @@ public class EqualityExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
-        return super.evaluate(runtime);
+        if(isEqual()) {
+            if (getLeftHandSide().getType().equals(CatscriptType.INT) && getRightHandSide().getType().equals(CatscriptType.INT)) {
+                Integer lhsvalue = (Integer) leftHandSide.evaluate(runtime);
+                Integer rhsvalue = (Integer) rightHandSide.evaluate(runtime);
+                if (lhsvalue.equals(rhsvalue)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (getLeftHandSide().getType().equals(CatscriptType.BOOLEAN) && getRightHandSide().getType().equals(CatscriptType.BOOLEAN)) {
+                Boolean lhsvalue = (Boolean) leftHandSide.evaluate(runtime);
+                Boolean rhsvalue = (Boolean) rightHandSide.evaluate(runtime);
+                if (lhsvalue.equals(rhsvalue)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (leftHandSide.getType().equals(CatscriptType.NULL) && rightHandSide.getType().equals(CatscriptType.NULL)) {
+                return true;
+            } else {
+                return false;
+            }
+        }else{
+            if (getLeftHandSide().getType().equals(CatscriptType.INT) && getRightHandSide().getType().equals(CatscriptType.INT)) {
+                Integer lhsvalue = (Integer) leftHandSide.evaluate(runtime);
+                Integer rhsvalue = (Integer) rightHandSide.evaluate(runtime);
+                if (lhsvalue.equals(rhsvalue)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else if (getLeftHandSide().getType().equals(CatscriptType.BOOLEAN) && getRightHandSide().getType().equals(CatscriptType.BOOLEAN)) {
+                Boolean lhsvalue = (Boolean) leftHandSide.evaluate(runtime);
+                Boolean rhsvalue = (Boolean) rightHandSide.evaluate(runtime);
+                if (lhsvalue.equals(rhsvalue)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else if (leftHandSide.getType().equals(CatscriptType.NULL) && rightHandSide.getType().equals(CatscriptType.NULL)) {
+                return false;
+            } else {
+                return true;
+            }
+        }
     }
 
     @Override

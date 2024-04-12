@@ -8,6 +8,8 @@ import edu.montana.csci.csci468.parser.ParseError;
 import edu.montana.csci.csci468.parser.SymbolTable;
 import edu.montana.csci.csci468.parser.expressions.Expression;
 
+import java.util.List;
+
 public class VariableStatement extends Statement {
     private Expression expression;
     private String variableName;
@@ -48,8 +50,11 @@ public class VariableStatement extends Statement {
         if (symbolTable.hasSymbol(variableName)) {
             addError(ErrorType.DUPLICATE_NAME);
         } else {
-            // TODO if there is an explicit type, ensure it is correct
-            //      if not, infer the type from the right hand side expression
+            if(explicitType!= null){
+                type = explicitType;
+            }else{
+                type = expression.getType();
+            }
             symbolTable.registerSymbol(variableName, type);
         }
     }
@@ -63,7 +68,22 @@ public class VariableStatement extends Statement {
     //==============================================================
     @Override
     public void execute(CatscriptRuntime runtime) {
-        super.execute(runtime);
+        this.addChild(expression);
+        if(getType().equals(CatscriptType.INT) || getExplicitType().equals(CatscriptType.INT)){
+           Integer val = (Integer) expression.evaluate(runtime);
+           runtime.setValue(variableName,val);
+       }else if(getType().equals(CatscriptType.STRING) || getExplicitType().equals(CatscriptType.STRING)){
+           String val = (String) expression.evaluate(runtime);
+           runtime.setValue(variableName,val);
+       }else if(getType().equals(CatscriptType.OBJECT) || getExplicitType().equals(CatscriptType.OBJECT)){
+           Object val = (Object) expression.evaluate(runtime);
+           runtime.setValue(variableName,val);
+       }else if(expression!=null){
+           List<Integer> val = (List<Integer>) expression.evaluate(runtime);
+           runtime.setValue(variableName,val);
+
+       }
+
     }
 
     @Override

@@ -43,6 +43,13 @@ public class AdditiveExpression extends Expression {
             if (!rightHandSide.getType().equals(CatscriptType.INT)) {
                 rightHandSide.addError(ErrorType.INCOMPATIBLE_TYPES);
             }
+        }else{
+           if(leftHandSide.getType().equals(CatscriptType.STRING)){
+               rightHandSide.toString();
+
+           }else{
+               leftHandSide.toString();
+           }
         }
         // TODO handle strings
     }
@@ -67,13 +74,32 @@ public class AdditiveExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
-        Integer lhsValue = (Integer) leftHandSide.evaluate(runtime);
-        Integer rhsValue = (Integer) rightHandSide.evaluate(runtime);
-        //TODO handle string case
-        if (isAdd()) {
-            return lhsValue + rhsValue;
-        } else {
-            return lhsValue - rhsValue;
+        if(getType().equals(CatscriptType.STRING)){
+            if(leftHandSide.getType().equals(CatscriptType.STRING) && rightHandSide.getType().equals(CatscriptType.STRING)){
+                String lhsValue = (String) leftHandSide.evaluate(runtime);
+                String rhsValue = (String) rightHandSide.evaluate(runtime);
+                return lhsValue + rhsValue;
+            }else if(leftHandSide.getType().equals(CatscriptType.STRING)){
+                String lhsValue = (String) leftHandSide.evaluate(runtime);
+                Integer rhsValue = (Integer) rightHandSide.evaluate(runtime);
+                String rhsval = rhsValue.toString();
+                return lhsValue + rhsval;
+            }else{
+                Integer lhsvalue = (Integer) leftHandSide.evaluate(runtime);
+                String rhsvalue = (String) rightHandSide.evaluate(runtime);
+                String lhsval = lhsvalue.toString();
+                return lhsval + rhsvalue;
+            }
+        }else {
+            Integer lhsValue = (Integer) leftHandSide.evaluate(runtime);
+            Integer rhsValue = (Integer) rightHandSide.evaluate(runtime);
+            //TODO handle string case
+
+            if (isAdd()) {
+                return lhsValue + rhsValue;
+            } else {
+                return lhsValue - rhsValue;
+            }
         }
     }
 

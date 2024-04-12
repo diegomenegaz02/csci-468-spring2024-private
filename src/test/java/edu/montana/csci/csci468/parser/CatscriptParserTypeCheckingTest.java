@@ -33,12 +33,12 @@ public class CatscriptParserTypeCheckingTest extends CatscriptTestBase {
         assertEquals(CatscriptType.INT, print.getExpression().getType());
     }
 
-   /* @Test
+    @Test
     void functionCallsWorkProperly() {
         PrintStatement print = parseStatement("function x():int{return 10} print( x() )", 1);
         assertEquals(CatscriptType.INT, print.getExpression().getType());
     }
-*/
+
     @Test
     void typeInferenceWorksForVars() {
         VariableStatement var = parseStatement("var x = 10");

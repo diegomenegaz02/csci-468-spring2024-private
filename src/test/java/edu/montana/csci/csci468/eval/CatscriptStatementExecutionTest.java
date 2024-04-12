@@ -39,8 +39,7 @@ public class CatscriptStatementExecutionTest extends CatscriptTestBase {
     }
 
     @Test
-    void localVarStatementsWorkProperly() {
-        assertEquals("1\n2\n3\n", executeProgram("for( x in [1, 2, 3] ) {\n" +
+    void localVarStatementsWorkProperly() {assertEquals("1\n2\n3\n", executeProgram("for( x in [1, 2, 3] ) {\n" +
                 "  var y = x\n" +
                 "  print(y)\n" +
                 "}\n"));
