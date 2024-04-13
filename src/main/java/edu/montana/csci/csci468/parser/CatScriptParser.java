@@ -66,7 +66,7 @@ public class CatScriptParser {
         if (printStmt != null) {
             return printStmt;
         }
-        Statement assignStmt = parseAssignmentStatement();
+        Statement assignStmt = parseAssignmentStatement(); // functioncall too
         if(assignStmt!= null){
             return assignStmt;
         }
@@ -102,7 +102,7 @@ public class CatScriptParser {
     private Statement parseFunctionDefinition() {
         if(tokens.match(FUNCTION)){
             tokens.consumeToken();
-            LinkedList<Statement> body = new LinkedList<>();
+            List<Statement> body = new ArrayList<>();
             FunctionDefinitionStatement functionDefinitionStatement= new FunctionDefinitionStatement();
 
             Token name = tokens.consumeToken();
@@ -121,7 +121,6 @@ public class CatScriptParser {
                         tokens.consumeToken();
                         TypeLiteral type = parseTypeExpression();
                         functionDefinitionStatement.addParameter(Identifier.getStringValue(), type);
-
                     }else{
                         TypeLiteral type = new TypeLiteral();
                         type.setType(CatscriptType.OBJECT);
@@ -131,7 +130,6 @@ public class CatScriptParser {
                         tokens.consumeToken();
                     }
                     //Get Rid of Comma
-
                 }//END OF WHILE
                 tokens.consumeToken(); // SHould be Right Param
                 if(tokens.match(COLON)){
@@ -147,11 +145,11 @@ public class CatScriptParser {
                     tokens.consumeToken();
                     while(!tokens.match(RIGHT_BRACE)) {
                         if(tokens.match(EOF)){
-                            functionDefinitionStatement.addError(ErrorType.UNEXPECTED_TOKEN,tokens.getCurrentToken());
+                            functionDefinitionStatement.setBody(body);
                             return functionDefinitionStatement;
                         }
                             Statement statement = parseProgramStatement();
-                            body.push(statement);
+                            body.add(statement);
                     }
                     tokens.consumeToken();
                 }
@@ -170,14 +168,14 @@ public class CatScriptParser {
             if(!tokens.match(RIGHT_BRACE)){
                 Expression expression = parseExpression();
                 returnStatement.setExpression(expression);
-
+                return returnStatement;
             }else{
-                returnStatement.setExpression(null);
-
+                Expression expression = parseExpression();
+                returnStatement.setExpression(expression);
                 return returnStatement;
             }
 
-            return returnStatement;
+
 
         }else{
             return null;
@@ -240,10 +238,10 @@ public class CatScriptParser {
 
     private Statement parseAssignmentStatement(){
         if(tokens.match(IDENTIFIER)){
-            Token IDToken = tokens.consumeToken();
-            if(tokens.match(EQUAL)){
+            Token IDToken = tokens.getCurrentToken();
+            FunctionCallExpression expression = parseFunctionCallExpression();
+            if(expression==null){
                 Token operator = tokens.consumeToken();
-
                 final Expression rightHandSide = parseExpression();
                 AssignmentStatement assignmentStatement = new AssignmentStatement();
                 assignmentStatement.setExpression(rightHandSide);
@@ -251,11 +249,8 @@ public class CatScriptParser {
                 assignmentStatement.setStart(IDToken);
                 assignmentStatement.setEnd(rightHandSide.getEnd());
                 return assignmentStatement;
-            }
-            else if(tokens.match(LEFT_PAREN)){
-                tokens.reset();
-                FunctionCallExpression functionCallExpression = parseFunctionCallExpression();
-                FunctionCallStatement functionCallStatement = new FunctionCallStatement(functionCallExpression);
+            } else {
+                FunctionCallStatement functionCallStatement = new FunctionCallStatement(expression);
                 return functionCallStatement;
             }
 
@@ -353,7 +348,6 @@ public class CatScriptParser {
                 variableStatement.setExpression(expression);
                 variableStatement.setVariableName(IDToken.getStringValue());
                 variableStatement.setStart(varToken);
-
                 variableStatement.setEnd(expression.getEnd());
                 return variableStatement;
             }
@@ -471,6 +465,7 @@ public class CatScriptParser {
                         return functionCallExpression;
                     }
                 }
+                tokens.consumeToken();
                 ListLiteralExpression listLiteralExpression = new ListLiteralExpression(arguments);
                 FunctionCallExpression functionCallExpression = new FunctionCallExpression(IDToken.getStringValue(),listLiteralExpression.getValues());
                 return functionCallExpression;
@@ -507,8 +502,8 @@ public class CatScriptParser {
                 ParenthesizedExpression parenthesizedExpression = new ParenthesizedExpression(expressionToParse);
                 return parenthesizedExpression;
         }else{
-            SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
-            return syntaxErrorExpression;
+            NullLiteralExpression nullLiteralExpression = new NullLiteralExpression();
+            return nullLiteralExpression;
         }
     }
     private FunctionCallExpression parseFunctionCallExpression(){
@@ -525,6 +520,7 @@ public class CatScriptParser {
                     }
 
                 }
+                tokens.consumeToken();
                 FunctionCallExpression functionCallExpression = new FunctionCallExpression(IDToken.getStringValue(), arguments);
                 return functionCallExpression;
             } else {

@@ -73,7 +73,7 @@ public class FunctionCallExpression extends Expression {
             Object stuff = (Object) argument.evaluate(runtime);
             expressions.add(stuff);
         }
-        FunctionDefinitionStatement function = getProgram().getFunction(name);
+        FunctionDefinitionStatement function = getProgram().getFunction(getName());
         Object returnVal = function.invoke(runtime,expressions);
         return returnVal;
     }
