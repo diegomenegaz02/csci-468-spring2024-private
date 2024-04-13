@@ -536,7 +536,7 @@ public class CatScriptParser {
             while(!tokens.match(RIGHT_BRACKET)){
                 Expression curExpression = parseExpression();
                 expressionList.add(curExpression);
-                if(tokens.match(COMMA)){
+                if(tokens.match(COMMA) || tokens.match(LEFT_BRACKET)){
                     tokens.consumeToken();
                 } else if (tokens.match(EOF)) {
                     Expression listLiteralExpression = new ListLiteralExpression(expressionList);
@@ -591,9 +591,14 @@ public class CatScriptParser {
             }else if(tokens.match(STRING)|| (String.equals("string"))){
                 typeLiteral.setType(CatscriptType.ListType.getListType(CatscriptType.STRING));
             }else if(tokens.match(TRUE) || tokens.match(FALSE) || String.equals("bool")){
-
+                typeLiteral.setType(CatscriptType.ListType.BOOLEAN);
             }else{
                 typeLiteral.setType(CatscriptType.ListType.getListType(CatscriptType.OBJECT));
+            }
+            if(tokens.match(RIGHT_PAREN)){
+                typeLiteral.setStart(obj);
+                typeLiteral.setEnd(obj);
+                return typeLiteral;
             }
             tokens.consumeToken();
             tokens.consumeToken();
