@@ -1,0 +1,4 @@
+Errors:
+
+- Missing source zip
+- Missing diego_menegaz_portfolio.pdf
