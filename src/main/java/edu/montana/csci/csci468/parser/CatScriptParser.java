@@ -274,8 +274,9 @@ public class CatScriptParser {
                     forStatement.setExpression(expression);
                     require(RIGHT_PAREN,forStatement,ErrorType.UNEXPECTED_TOKEN);
                     if(tokens.match(LEFT_BRACE)){
+                        tokens.consumeToken();
                         while(!tokens.match(RIGHT_BRACE)) {
-                            tokens.consumeToken();
+
                             Statement statement = parseProgramStatement();
                             statementList.add(statement);
                             if(tokens.match(EOF)){
@@ -583,7 +584,10 @@ public class CatScriptParser {
         }else if(tokenString.equals("list")){
             Token obj = tokens.consumeToken();
 
-            require(LESS,typeLiteral,ErrorType.UNEXPECTED_TOKEN);
+
+            if(tokens.match(LESS)){
+                tokens.consumeToken();
+            }
             Token current = tokens.getCurrentToken();
             String String = current.getStringValue();
             if(tokens.match(INTEGER)|| (String.equals("int"))){

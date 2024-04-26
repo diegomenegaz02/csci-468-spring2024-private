@@ -47,8 +47,10 @@ public class AdditiveExpression extends Expression {
            if(leftHandSide.getType().equals(CatscriptType.STRING)){
                rightHandSide.toString();
 
-           }else{
-               leftHandSide.toString();
+           }else if (leftHandSide.getType().equals(CatscriptType.NULL)){
+               leftHandSide.getStart().getStringValue();
+           }else if (rightHandSide.getType().equals(CatscriptType.NULL)){
+               rightHandSide.getStart().getStringValue();
            }
         }
         // TODO handle strings
@@ -84,6 +86,10 @@ public class AdditiveExpression extends Expression {
                 Integer rhsValue = (Integer) rightHandSide.evaluate(runtime);
                 String rhsval = rhsValue.toString();
                 return lhsValue + rhsval;
+            }else if (leftHandSide.getType().equals(CatscriptType.NULL) || rightHandSide.getType().equals(CatscriptType.NULL)){
+                String lhsval = (String) leftHandSide.evaluate(runtime);
+                String rhsval = (String) rightHandSide.evaluate(runtime);
+                return lhsval + rhsval;
             }else{
                 Integer lhsvalue = (Integer) leftHandSide.evaluate(runtime);
                 String rhsvalue = (String) rightHandSide.evaluate(runtime);
