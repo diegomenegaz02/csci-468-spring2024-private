@@ -4,11 +4,11 @@ import edu.montana.csci.csci468.bytecode.ByteCodeGenerator;
 import edu.montana.csci.csci468.eval.CatscriptRuntime;
 import edu.montana.csci.csci468.parser.CatscriptType;
 import edu.montana.csci.csci468.parser.SymbolTable;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.analysis.Value;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class ListLiteralExpression extends Expression {
     List<Expression> values;
@@ -64,7 +64,29 @@ public class ListLiteralExpression extends Expression {
 
     @Override
     public void compile(ByteCodeGenerator code) {
-        super.compile(code);
+        code.addTypeInstruction(Opcodes.NEW,ByteCodeGenerator.internalNameFor(ArrayList.class));
+        code.addInstruction(Opcodes.DUP);
+        code.addMethodInstruction(Opcodes.INVOKESPECIAL,ByteCodeGenerator.internalNameFor(ArrayList.class),"constructor",
+                "java/util/ArrayList.<init>()V");
+        code.addInstruction(Opcodes.ASTORE);
+        for(Expression val : values){
+            code.addInstruction(Opcodes.DUP);
+            //INVOKESTATIC - Value Of
+            //STORE
+            val.compile(code);
+            if(getType().equals(CatscriptType.INT)||getType().equals(CatscriptType.BOOLEAN)){
+                code.addInstruction(Opcodes.ILOAD);
+            }else{
+                code.addInstruction(Opcodes.ALOAD);
+            }
+            code.addMethodInstruction(Opcodes.INVOKESTATIC,ByteCodeGenerator.internalNameFor(Integer.class),"valueOf",
+                    "(Ljava/lang/Object;)Ljava/lang/Integer");
+            code.addMethodInstruction(Opcodes.INVOKEINTERFACE,ByteCodeGenerator.internalNameFor(Object.class),"AddtoList",
+                    "(Ljava/util/List/add(Ljava/lang/Object;)Z");
+            code.addInstruction(Opcodes.POP);
+
+        }
+
     }
 
 

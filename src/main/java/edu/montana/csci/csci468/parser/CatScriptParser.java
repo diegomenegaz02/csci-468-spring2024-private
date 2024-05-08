@@ -474,7 +474,8 @@ public class CatScriptParser {
 
                 IdentifierExpression identifierExpression = new IdentifierExpression(IDToken.getStringValue());
                 identifierExpression.setToken(IDToken);
-
+                identifierExpression.setStart(IDToken);
+                identifierExpression.setEnd(tokens.getCurrentToken());
 
                 return identifierExpression;
             }
@@ -482,25 +483,33 @@ public class CatScriptParser {
             Token falseToken = tokens.consumeToken();
             BooleanLiteralExpression booleanLiteralExpression = new BooleanLiteralExpression(false);
             booleanLiteralExpression.setToken(falseToken);
+            booleanLiteralExpression.setStart(falseToken);
+            booleanLiteralExpression.setEnd(falseToken);
             return booleanLiteralExpression;
         } else if(tokens.match(TRUE)) {
             Token trueToken = tokens.consumeToken();
             BooleanLiteralExpression booleanLiteralExpression = new BooleanLiteralExpression(true);
             booleanLiteralExpression.setToken(trueToken);
+            booleanLiteralExpression.setStart(trueToken);
+            booleanLiteralExpression.setEnd(trueToken);
             return booleanLiteralExpression;
         }else if(tokens.match(NULL)) {
             Token trueToken = tokens.consumeToken();
             NullLiteralExpression nullLiteralExpression = new NullLiteralExpression();
             nullLiteralExpression.setToken(trueToken);
+            nullLiteralExpression.setStart(trueToken);
+            nullLiteralExpression.setEnd(trueToken);
             return nullLiteralExpression;
         }else if(tokens.match(LEFT_BRACKET) || tokens.match(LEFT_BRACE)) {
             Expression listLiteralExpression = parseListExpression();
             return listLiteralExpression;
         }else if(tokens.match(LEFT_PAREN)){
-                tokens.consumeToken();
+                Token start = tokens.consumeToken();
                 Expression expressionToParse = parseExpression();
                 require(RIGHT_PAREN,expressionToParse);
                 ParenthesizedExpression parenthesizedExpression = new ParenthesizedExpression(expressionToParse);
+                parenthesizedExpression.setEnd(tokens.getCurrentToken());
+                parenthesizedExpression.setStart(start);
                 return parenthesizedExpression;
         }else{
             NullLiteralExpression nullLiteralExpression = new NullLiteralExpression();
@@ -523,6 +532,8 @@ public class CatScriptParser {
                 }
                 tokens.consumeToken();
                 FunctionCallExpression functionCallExpression = new FunctionCallExpression(IDToken.getStringValue(), arguments);
+                functionCallExpression.setStart(IDToken);
+                functionCallExpression.setEnd(tokens.getCurrentToken());
                 return functionCallExpression;
             } else {
                 return null;
@@ -545,8 +556,10 @@ public class CatScriptParser {
                     return listLiteralExpression;
                 }
             }
-            tokens.consumeToken();
+            Token end = tokens.consumeToken();
             ListLiteralExpression listLiteralExpression = new ListLiteralExpression(expressionList);
+            listLiteralExpression.setStart(lb);
+            listLiteralExpression.setEnd(end);
             return listLiteralExpression;
         }
         return null;
@@ -560,6 +573,8 @@ public class CatScriptParser {
 
             Token string = tokens.consumeToken();
             typeLiteral.setType(CatscriptType.STRING);
+            typeLiteral.setStart(string);
+            typeLiteral.setEnd(string);
             return typeLiteral;
         }else if(tokens.match(INTEGER)|| (tokenString.equals("int")))  {
 
@@ -588,6 +603,7 @@ public class CatScriptParser {
             if(tokens.match(LESS)){
                 tokens.consumeToken();
             }
+
             Token current = tokens.getCurrentToken();
             String String = current.getStringValue();
             if(tokens.match(INTEGER)|| (String.equals("int"))){
@@ -600,6 +616,11 @@ public class CatScriptParser {
                 typeLiteral.setType(CatscriptType.ListType.getListType(CatscriptType.OBJECT));
             }
             if(tokens.match(RIGHT_PAREN)){
+                typeLiteral.setStart(obj);
+                typeLiteral.setEnd(obj);
+                return typeLiteral;
+            }
+            if(tokens.match(LEFT_BRACE)){
                 typeLiteral.setStart(obj);
                 typeLiteral.setEnd(obj);
                 return typeLiteral;

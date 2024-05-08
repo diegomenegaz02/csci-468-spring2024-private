@@ -35,6 +35,7 @@ public class CatscriptType {
     public static CatscriptType getListType(CatscriptType type) {
         return new ListType(type);
     }
+    //HIGHLIGHTS AHHHHHHHHHHHH SO PRETTY SO YELLOW
 
     @Override
     public String toString() {

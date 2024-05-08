@@ -47,10 +47,8 @@ public class AdditiveExpression extends Expression {
            if(leftHandSide.getType().equals(CatscriptType.STRING)){
                rightHandSide.toString();
 
-           }else if (leftHandSide.getType().equals(CatscriptType.NULL)){
-               leftHandSide.getStart().getStringValue();
-           }else if (rightHandSide.getType().equals(CatscriptType.NULL)){
-               rightHandSide.getStart().getStringValue();
+           } else if (rightHandSide.getType().equals(CatscriptType.STRING)) {
+               leftHandSide.toString();
            }
         }
         // TODO handle strings
@@ -86,11 +84,17 @@ public class AdditiveExpression extends Expression {
                 Integer rhsValue = (Integer) rightHandSide.evaluate(runtime);
                 String rhsval = rhsValue.toString();
                 return lhsValue + rhsval;
-            }else if (leftHandSide.getType().equals(CatscriptType.NULL) || rightHandSide.getType().equals(CatscriptType.NULL)){
-                String lhsval = (String) leftHandSide.evaluate(runtime);
+            }else if (leftHandSide.getType().equals(CatscriptType.NULL)){
+                String lhsval = "null";
+                leftHandSide.evaluate(runtime);
                 String rhsval = (String) rightHandSide.evaluate(runtime);
                 return lhsval + rhsval;
-            }else{
+            } else if (rightHandSide.getType().equals(CatscriptType.NULL)) {
+                String rhsval = "null";
+                String lhsval = (String) leftHandSide.evaluate(runtime);
+                rightHandSide.evaluate(runtime);
+                return lhsval + rhsval;
+            } else{
                 Integer lhsvalue = (Integer) leftHandSide.evaluate(runtime);
                 String rhsvalue = (String) rightHandSide.evaluate(runtime);
                 String lhsval = lhsvalue.toString();
@@ -118,13 +122,32 @@ public class AdditiveExpression extends Expression {
 
     @Override
     public void compile(ByteCodeGenerator code) {
-        getLeftHandSide().compile(code);
-        getRightHandSide().compile(code);
-        if (isAdd()) {
-            code.addInstruction(Opcodes.IADD);
-        } else {
-            code.addInstruction(Opcodes.ISUB);
+
+
+        if(getType().equals(CatscriptType.STRING)){
+            getLeftHandSide().compile(code);
+            code.addMethodInstruction(Opcodes.INVOKESTATIC,ByteCodeGenerator.internalNameFor(String.class),
+                    "valueOf",
+                    "(Ljava/lang/Object;)Ljava/lang/String;");
+            getRightHandSide().compile(code);
+            code.addMethodInstruction(Opcodes.INVOKESTATIC,ByteCodeGenerator.internalNameFor(String.class),
+                    "valueOf",
+                    "(Ljava/lang/Object;)Ljava/lang/String;");
+            code.addMethodInstruction(Opcodes.INVOKEVIRTUAL,
+                    ByteCodeGenerator.internalNameFor(String.class),
+                    "concat",
+                    "(Ljava/lang/String;)Ljava/lang/String;");
+            code.addInstruction(Opcodes.ASTORE);
+        }else{
+            getLeftHandSide().compile(code);
+            getRightHandSide().compile(code);
+            if (isAdd()) {
+                code.addInstruction(Opcodes.IADD);
+            } else {
+                code.addInstruction(Opcodes.ISUB);
+            }
         }
+
     }
 
 }

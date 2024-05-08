@@ -6,6 +6,11 @@ import edu.montana.csci.csci468.parser.CatscriptType;
 import edu.montana.csci.csci468.parser.SymbolTable;
 import edu.montana.csci.csci468.tokenizer.Token;
 import edu.montana.csci.csci468.tokenizer.TokenType;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
+
+import java.lang.management.OperatingSystemMXBean;
+import java.util.Objects;
 
 public class EqualityExpression extends Expression {
 
@@ -107,7 +112,38 @@ public class EqualityExpression extends Expression {
 
     @Override
     public void compile(ByteCodeGenerator code) {
-        super.compile(code);
+        if(isEqual()){
+            Label pushTrue = new Label();
+            Label pushFalse = new Label();
+            leftHandSide.compile(code);
+            code.addMethodInstruction(Opcodes.INVOKESTATIC,ByteCodeGenerator.internalNameFor(Integer.class),"valueOf",
+                    "(Ljava/lang/Object;)Ljava/lang/Integer");
+            rightHandSide.compile(code);
+            code.addMethodInstruction(Opcodes.INVOKEVIRTUAL,ByteCodeGenerator.internalNameFor(Integer.class),
+                    "equals","(Ljava/lang/Object/equals(Ljava/lang/Object;)Z");
+            code.addJumpInstruction(Opcodes.IFNE,pushTrue);
+            code.pushConstantOntoStack(false);
+            code.addJumpInstruction(Opcodes.NOP,pushFalse);
+            code.addLabel(pushTrue);
+            code.pushConstantOntoStack(true);
+            code.addLabel(pushFalse);
+        }else{
+            Label pushTrue = new Label();
+            Label pushFalse = new Label();
+            leftHandSide.compile(code);
+            code.addMethodInstruction(Opcodes.INVOKESTATIC,ByteCodeGenerator.internalNameFor(Integer.class),"valueOf",
+                    "(Ljava/lang/Object;)Ljava/lang/Integer");
+            rightHandSide.compile(code);
+            code.addMethodInstruction(Opcodes.INVOKEVIRTUAL,ByteCodeGenerator.internalNameFor(Integer.class),
+                    "equals","(Ljava/lang/Object/equals(Ljava/lang/Object;)Z");
+            code.addJumpInstruction(Opcodes.IFNE,pushTrue);
+            code.pushConstantOntoStack(true);
+            code.addJumpInstruction(Opcodes.NOP,pushFalse);
+            code.addLabel(pushTrue);
+            code.pushConstantOntoStack(false);
+            code.addLabel(pushFalse);
+        }
+
     }
 
 

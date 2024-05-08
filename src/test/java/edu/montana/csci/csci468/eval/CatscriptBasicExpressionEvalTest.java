@@ -40,7 +40,7 @@ public class CatscriptBasicExpressionEvalTest extends CatscriptTestBase {
 
     @Test
     void additiveStringExpressionEvaluatesProperly() {
-        assertEquals("1a", evaluateExpression("1 + \"a\""));
+        assertEquals("1a", evaluateExpression("1 + null"));
         assertEquals("a1", evaluateExpression("\"a\" + 1"));
         assertEquals("nulla", evaluateExpression("null + \"a\""));
         assertEquals("anull", evaluateExpression("\"a\" + null"));
