@@ -29,8 +29,12 @@ stopping the need to re-initialize every element's type. Saving the need for man
 # Section 4: Technical writing. Include the technical document that accompanied your capstone project.
 
 # Section 5: UML. 
+## for (x in [1,2,3]) { print(x)}
 
-Include a UML diagram for parse elements
+# This is a for loop sequence diagram citing how the For Loop Statement is parsed, parseProgram takes an input, calls parseStatement
+which then will return null until calling parseForLoop, which will then again call parseStatement, again returning null until it calls parsePrintStatement which will then
+call parseExpression
+UML Diagram is in the folder as a PNG would not work here for whatever reason.
 
 # Section 6: Design trade-offs
 

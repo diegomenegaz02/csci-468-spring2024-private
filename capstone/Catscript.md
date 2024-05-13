@@ -34,8 +34,9 @@ body of statements and also pushes a local scope.
 ```
 print(1)
 ```
-Print statements takes a statement or expression, and then ouputs the evaluation of the statement or expression.
-Print can be done to Literals, expressions, and output of statements.
+Print statements use a "print" keyword as well as an opening and closing parenthesis to encapsulate the expression or statement.
+Valid types of a print statement are int, bool, null,string, and object. If the syntax of the print statement is correct it
+will return the print statements evaluated expression. If there is a syntax error such as an unterminated argument list it will return an error.
 
 ### Variable Declaration Statement
 ```
@@ -70,14 +71,19 @@ be linked via a hashmap to the function name key and the definition value.
 ```
 x = 25 + foo()
 ```
-Function Call statements take an identifier and then a list of parameters expressions. It then takes the arguments and invokes the function
-definition and then returns the return value.
+A function is called by referencing it through an identifier for an already defined function including all 
+parameters specified in its declaration. This procedure invokes the function's statement body with the entered 
+parameters and returns a value if one is required the types must match. An error called "unterminated argument list" 
+will occur if there is a missing parenthesis at either end of the call.
 
 ### Return Statement
 ```
 return "Hello  World"
 ```
-Return calls have a 'return' and a statement, the statement result is popped up 1 in the scopes stack.
+Return statements necessitate the use of the "return" keyword and must include a value that corresponds with the 
+function's declared return type. For instance, if a function is specified to return an integer (int), then the return value 
+should also be of the integer type, making it a correct return statement. A return statement can provide any type of 
+value, provided that it aligns with the type specified in the function’s definition
 
 ### Additive Operator (Additive Expression)
 ```
@@ -97,14 +103,15 @@ For Boolean values you will concat "true" or "false" to the String value.
 ```
 -1
 ```
-Minus operators contain an - operator and an expression.Unary operators negate the value of the expression to the right of the operator.
+Minus operators contain an - operator and an expression.Unary operators negate the value of the expression to the right of 
+the operator. For instance if you have -5 you would have 0 -|5|.
 
 ### Minus Operator (Additive Expression)
 ```
 2-1
 ```
-When minus operators have both a left and right expression and operator, they are evaluated under the Additive Expression as asubtraction.
-The operator will subtract the value of the right expression from the left expression.
+When minus operators have both a left and right expression and operator, they are evaluated under the Additive Expression as a subtraction.
+The expression will evaluate as the right expression subtracted from the left expression, available for Int types only.
 
 ### Not Operator (Unary Expression)
 ```
